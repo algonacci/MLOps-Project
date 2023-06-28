@@ -1,15 +1,16 @@
-from flask import Flask, jsonify
+from fastapi import FastAPI
 
-app = Flask(__name__)
+app = FastAPI()
 
-@app.route("/")
+@app.get("/")
 def index():
-    return jsonify({
+    return {
         "status": {
             "code": 200,
             "message": "Success fetching the API"
         }
-    }), 200
+    }
 
 if __name__ == "__main__":
-    app.run()
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
