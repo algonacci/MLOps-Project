@@ -1,14 +1,18 @@
+import os
 import pickle
 from fastapi import FastAPI
 from pydantic import BaseModel
 
 app = FastAPI()
 
+
 class TextInput(BaseModel):
     text: str
 
+
 model = pickle.load(open('spam.pkl', 'rb'))
 cv = pickle.load(open('vectorizer.pkl', 'rb'))
+
 
 @app.get("/")
 def index():
@@ -18,6 +22,7 @@ def index():
             "message": "Success fetching the API"
         }
     }
+
 
 @app.post("/predict")
 def predict_spam(text_input: TextInput):
@@ -29,6 +34,9 @@ def predict_spam(text_input: TextInput):
     else:
         return {"prediction": "This is A Spam Email"}
 
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app,
+                host="0.0.0.0",
+                port=int(os.environ.get("PORT", 8080)))
