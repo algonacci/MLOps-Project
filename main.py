@@ -1,9 +1,11 @@
 import os
 import pickle
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+import warnings
 
 app = FastAPI()
+warnings.filterwarnings("ignore")
 
 
 class TextInput(BaseModel):
@@ -26,13 +28,16 @@ def index():
 
 @app.post("/predict")
 def predict_spam(text_input: TextInput):
-    data = [text_input.text]
-    vec = cv.transform(data).toarray()
+    data = text_input.text.strip()
+    if not data:
+        raise HTTPException(status_code=400, detail="Empty input text")
+
+    vec = cv.transform([data]).toarray()
     result = model.predict(vec)
     if result[0] == 0:
-        return {"prediction": "This is Not A Spam Email"}
+        return {"prediction": "Ham"}
     else:
-        return {"prediction": "This is A Spam Email"}
+        return {"prediction": "Spam"}
 
 
 if __name__ == "__main__":
