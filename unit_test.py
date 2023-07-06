@@ -34,5 +34,23 @@ def test_predict_spam(client):
     assert response.json() == {"prediction": "Spam"}
 
 
+def test_predict_empty_input(client):
+    input_data = {"text": ""}
+    response = client.post("/predict", json=input_data)
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Empty input text"}
+
+
+def test_unsupported_http_method(client):
+    response = client.put("/predict")
+    assert response.status_code == 405
+
+
+def test_missing_required_field(client):
+    input_data = {"wrong_field": "This is a test"}
+    response = client.post("/predict", json=input_data)
+    assert response.status_code == 422
+
+
 if __name__ == "__main__":
     pytest.main([__file__])
